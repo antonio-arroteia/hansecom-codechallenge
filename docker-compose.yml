@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: codechallenge_db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: codechallenge_db
+      POSTGRES_USER:
+      POSTGRES_PASSWORD:
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  hansecom-codechallenge:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hansecom-codechallenge
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/codechallenge_db
+      SPRING_DATASOURCE_USERNAME:
+      SPRING_DATASOURCE_PASSWORD:
+    volumes:
+      - ./build/libs:/app/build/libs
+    command: java -jar /hansecom-codechallenge.war
+
+volumes:
+  postgres_data:

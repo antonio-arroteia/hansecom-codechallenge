@@ -1,0 +1,61 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation template for deploying hansecom-codechallenge Spring Boot application
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    Description: The environment to deploy the application (e.g., dev, prod)
+
+Resources:
+  HansecomCodeChallengeEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-0c55b159cbfafe1f0 # Replace with appropriate AMI ID
+      InstanceType: t2.micro # Change instance type if necessary
+      SecurityGroupIds:
+        - sg-12345678 # Replace with appropriate security group ID
+      SubnetId: subnet-12345678 # Replace with appropriate subnet ID
+      Tags:
+        - Key: Name
+          Value: !Sub "hansecom-codechallenge-${Environment}"
+
+  HansecomCodeChallengeLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub "hansecom-codechallenge-lb-${Environment}"
+      Subnets:
+        - subnet-12345678 # Replace with appropriate subnet ID
+      SecurityGroups:
+        - sg-12345678 # Replace with appropriate security group ID
+      Scheme: internet-facing
+      Tags:
+        - Key: Name
+          Value: !Sub "hansecom-codechallenge-lb-${Environment}"
+
+  HansecomCodeChallengeListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref HansecomCodeChallengeTargetGroup
+      LoadBalancerArn: !Ref HansecomCodeChallengeLoadBalancer
+      Port: 80
+      Protocol: HTTPS
+
+  HansecomCodeChallengeTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub "hansecom-codechallenge-tg-${Environment}"
+      Port: 8080
+      Protocol: HTTP
+      VpcId: vpc-12345678 # Replace with appropriate VPC ID
+      TargetType: instance
+      Tags:
+        - Key: Name
+          Value: !Sub "hansecom-codechallenge-tg-${Environment}"
+
+Outputs:
+  HansecomCodeChallengeEndpoint:
+    Description: URL of the hansecom-codechallenge application
+    Value: !GetAtt HansecomCodeChallengeLoadBalancer.DNSName

@@ -1,0 +1,22 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo "Installing dependencies..."
+      - npm install -g aws-cdk # Install AWS CDK globally
+      - npm install
+
+  build:
+    commands:
+      - echo "Building the Spring Boot application..."
+      - mvn clean package
+
+  deploy:
+    commands:
+      - echo "Deploying the application to AWS..."
+      - cdk deploy --require-approval never
+
+artifacts:
+  files:
+    - '**/*'
