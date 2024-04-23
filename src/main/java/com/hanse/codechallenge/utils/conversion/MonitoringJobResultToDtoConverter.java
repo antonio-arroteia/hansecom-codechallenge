@@ -12,9 +12,10 @@ public class MonitoringJobResultToDtoConverter implements Converter<PersistedMon
     public JobResultDTO convert(PersistedMonitoringResult source) {
         return new JobResultDTO(
                 source.getResult(),
-                source.getResponseTime(),
+                source.getResponseTimeInMs(),
                 source.getStatusName(),
-                source.getInfo()
+                source.getInfo(),
+                source.getCreationDate()
         );
     }
 }

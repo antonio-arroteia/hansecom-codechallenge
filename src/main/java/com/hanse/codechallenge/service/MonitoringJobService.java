@@ -48,8 +48,8 @@ public class MonitoringJobService {
         boolean updateTasks = monitorJobToUpdate.getIntervalInSeconds() != monitorJobToUpdate.getIntervalInSeconds() ||
                 !monitorJobToUpdate.getJobName().equals(monitoringJobDTO.getJobName()) || !monitorJobToUpdate.getUrl().equals(monitoringJobDTO.getUrl());
 
-        monitorJobToUpdate.setUrl(monitoringJobDTO.getUrl());
         monitorJobToUpdate.setJobName(monitoringJobDTO.getJobName());
+        if(monitoringJobDTO.getUrl() != null) monitorJobToUpdate.setUrl(monitoringJobDTO.getUrl());
         monitorJobToUpdate.setIntervalInSeconds(monitoringJobDTO.getIntervalInSeconds());
 
         if(updateTasks) monitoringJobExecutionService.updateTasks();

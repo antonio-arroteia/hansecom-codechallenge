@@ -10,8 +10,10 @@ import com.hanse.codechallenge.controller.dto.TimeRange;
 import com.hanse.codechallenge.enums.Result;
 import com.hanse.codechallenge.persistence.repository.MonitoringJobRepository;
 import com.hanse.codechallenge.persistence.repository.MonitoringJobResultRepository;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.hanse.codechallenge.controller.dto.JobResultSearchCriteriaDTO;
@@ -38,6 +40,7 @@ class MonitoringJobResultRepositoryIntegrationTest {
         PersistedMonitoringJob job1 = new PersistedMonitoringJob();
         job1.setJobName("job1");
         job1.setIntervalInSeconds( 10);
+        job1.setUrl("http://example.com");
 
         PersistedMonitoringResult result1 = new PersistedMonitoringResult(Result.SUCCESS, 100, HttpStatus.OK.name(), "Info for result 1");
         PersistedMonitoringResult result2 = new PersistedMonitoringResult(Result.FAILED, 200, HttpStatus.INTERNAL_SERVER_ERROR.name(), "Info for result 2");
@@ -46,7 +49,8 @@ class MonitoringJobResultRepositoryIntegrationTest {
 
         PersistedMonitoringJob job2 = new PersistedMonitoringJob();
         job2.setJobName("job2");
-        job2.setIntervalInSeconds( 10);
+        job2.setIntervalInSeconds(10);
+        job2.setUrl("http://example.com");
 
         PersistedMonitoringResult result3 = new PersistedMonitoringResult(Result.SUCCESS, 150, HttpStatus.OK.name(), "Info for result 3");
 
@@ -87,8 +91,8 @@ class MonitoringJobResultRepositoryIntegrationTest {
 
     @Test
     void testSearchByTimeRange() {
-        Instant startTime = Instant.now().minusSeconds(20);
-        Instant endTime = Instant.now().plusSeconds(20);
+        Instant startTime = Instant.now().minusSeconds(30);
+        Instant endTime = Instant.now().plusSeconds(30);
 
         JobResultSearchCriteriaDTO criteria = new JobResultSearchCriteriaDTO();
         criteria.setTimeRange(new TimeRange(startTime, endTime));
@@ -114,11 +118,10 @@ class MonitoringJobResultRepositoryIntegrationTest {
     @Test
     void testSearchByJobNameAndTimeRange() {
         Instant startTime = Instant.now().minusSeconds(20); // Four seconds ago
-        Instant endTime = Instant.now().plusSeconds(20); // One second ago
 
         JobResultSearchCriteriaDTO criteria = new JobResultSearchCriteriaDTO();
         criteria.setJobName("job2");
-        criteria.setTimeRange(new TimeRange(startTime, endTime));
+        criteria.setTimeRange(new TimeRange(startTime, null));
 
         List<PersistedMonitoringResult> results = repository.searchAllBy(criteria);
 
@@ -128,12 +131,11 @@ class MonitoringJobResultRepositoryIntegrationTest {
 
     @Test
     void testSearchByStatusAndTimeRange() {
-        Instant startTime = Instant.now().minusSeconds(20); // Five seconds ago
         Instant endTime = Instant.now().plusSeconds(20); // One second ago
 
         JobResultSearchCriteriaDTO criteria = new JobResultSearchCriteriaDTO();
         criteria.setStatus(HttpStatus.OK);
-        criteria.setTimeRange(new TimeRange(startTime, endTime));
+        criteria.setTimeRange(new TimeRange(null, endTime));
 
         List<PersistedMonitoringResult> results = repository.searchAllBy(criteria);
 

@@ -50,7 +50,6 @@ public class MonitoringJobControllerIntegrationTest {
     @Test
     public void testConfigureNewMonitorJob() throws Exception {
         MonitoringJobDTO inputDTO = new MonitoringJobDTO("JobName", "https://example.com", 60, Instant.now(), null);
-        PersistedMonitoringJob persistedJob = new PersistedMonitoringJob(1L, "JobName", "https://example.com", 60, Collections.emptyList());
         objectMapper.registerModule(new JavaTimeModule());
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/jobs/configure-new-monitoring-job")
@@ -58,8 +57,8 @@ public class MonitoringJobControllerIntegrationTest {
                         .content(objectMapper.writeValueAsBytes(inputDTO)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.jobName", Matchers.is(persistedJob.getJobName())))
-                .andExpect(jsonPath("$.url", Matchers.is(persistedJob.getUrl())));
+                .andExpect(jsonPath("$.jobName", Matchers.is(inputDTO.getJobName())))
+                .andExpect(jsonPath("$.url", Matchers.is(inputDTO.getUrl())));
 
 
     }
@@ -88,9 +87,9 @@ public class MonitoringJobControllerIntegrationTest {
     public void testGetAllMonitoringJobs() throws Exception {
 
         List<PersistedMonitoringJob> jobsList = List.of(
-            new PersistedMonitoringJob(1L, "JobName1", "https://example.com", 60L, Collections.emptyList()),
-            new PersistedMonitoringJob(1L, "JobName2", "https://example.com", 60L, Collections.emptyList()),
-            new PersistedMonitoringJob(1L, "JobName3", "https://example.com", 60L, Collections.emptyList())
+            new PersistedMonitoringJob(null, "JobName1", "https://example.com", 60L, Collections.emptyList()),
+            new PersistedMonitoringJob(null, "JobName2", "https://example.com", 60L, Collections.emptyList()),
+            new PersistedMonitoringJob(null, "JobName3", "https://example.com", 60L, Collections.emptyList())
         );
 
         monitoringJobRepository.saveAllAndFlush(jobsList);

@@ -84,17 +84,17 @@ public class MonitoringJobExecutionService {
             long responseTime = endTime - startTime;
 
             if(responseCode == HttpURLConnection.HTTP_OK) {
-                logger.info("Monitoring Job: "+ jobName + "URL: " + url + " - Success, Response Time: " + responseTime + " ms");
+                logger.info("Monitoring Job: "+ jobName + " URL: " + url + " - Success, Response Time: " + responseTime + " ms");
                 return new JobResult(Result.SUCCESS, responseTime, HttpStatus.OK);
 
             } else {
-                logger.info("Monitoring Job: "+ jobName + "URL: " + url + " - Failed, Response Code: " + responseCode);
+                logger.info("Monitoring Job: "+ jobName + " URL: " + url + " - Failed, Response Code: " + responseCode);
                 return new JobResult(Result.FAILED, responseTime, HttpStatus.valueOf(responseCode));
 
             }
 
         } catch (IOException e) {
-            logger.error("Monitoring Job: "+ jobName + "URL: " + url + " - Failed, Exception: Impossible connecting to " + e.getMessage());
+            logger.error("Monitoring Job: "+ jobName + " URL: " + url + " - Failed, Exception: Impossible connecting to " + e.getMessage());
             return new JobResult(Result.FAILED,0,HttpStatus.NOT_FOUND);
 
         } finally {

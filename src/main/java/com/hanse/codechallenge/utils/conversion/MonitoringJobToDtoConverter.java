@@ -17,7 +17,7 @@ public class MonitoringJobToDtoConverter implements Converter<PersistedMonitorin
                 source.getUrl(),
                 source.getIntervalInSeconds(),
                 source.getCreationDate(),
-                source.getResults() != null ? source.getResults().stream().map(r -> new JobResultDTO(r.getResult(), r.getResponseTime(), r.getStatusName(), r.getInfo())).collect(Collectors.toList()) : null
+                source.getResults() != null ? source.getResults().stream().map(r -> new JobResultDTO(r.getResult(), r.getResponseTimeInMs(), r.getStatusName(), r.getInfo(), r.getCreationDate())).collect(Collectors.toList()) : null
                 );
     }
 }

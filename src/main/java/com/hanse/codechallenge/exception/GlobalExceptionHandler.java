@@ -3,6 +3,7 @@ package com.hanse.codechallenge.exception;
 import com.hanse.codechallenge.controller.dto.ErrorResponseDTO;
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.core.task.TaskRejectedException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +33,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ResponseBody
     public ResponseEntity<ErrorResponseDTO> handleIllegalArgumentException(IllegalArgumentException ex) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(status, ex.getMessage());
+        return ResponseEntity.status(status).body(errorResponse);
+    }
+
+    @ExceptionHandler(TaskRejectedException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseBody
+    public ResponseEntity<ErrorResponseDTO> handleTaskRejectedException(TaskRejectedException ex) {
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         ErrorResponseDTO errorResponse = new ErrorResponseDTO(status, ex.getMessage());
         return ResponseEntity.status(status).body(errorResponse);
     }

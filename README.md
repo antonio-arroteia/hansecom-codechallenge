@@ -43,7 +43,7 @@ You can also use an API Manager like Postman, following the swagger documentatio
 The project's unit and integration tests run during the application build, but you can run it at any time by using the command "./gradlew test" from the root.
 
 ## Blockers
-
+I was not able to deploy the application with Docker. I know 
 
 ## Future Implementations
 

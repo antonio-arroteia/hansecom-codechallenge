@@ -45,12 +45,15 @@ public class MonitoringJobResultRepository {
             Instant minRange = criteria.getTimeRange().getLowerBound();
             Instant maxRange = criteria.getTimeRange().getUpperBound();
             if(minRange !=null && maxRange != null ) {
-                predicates.add(cb.between(resultJoin.get("creationDate"), Timestamp.from(minRange),
-                        Timestamp.from(maxRange)));
-            }else if(minRange != null){
-                predicates.add(cb.greaterThan(resultJoin.get("creationDate"), Timestamp.from(minRange)));
-            }else{
-                predicates.add(cb.lessThan(resultJoin.get("creationDate"), Timestamp.from(maxRange)));
+                predicates.add(cb.greaterThanOrEqualTo(resultJoin.get("creationDate"), minRange));
+                predicates.add(cb.lessThanOrEqualTo(resultJoin.get("creationDate"), maxRange));
+            } else {
+                if(minRange != null) {
+                    predicates.add(cb.greaterThanOrEqualTo(resultJoin.get("creationDate"), minRange));
+                }
+                if(maxRange != null) {
+                    predicates.add(cb.lessThanOrEqualTo(resultJoin.get("creationDate"), maxRange));
+                }
             }
         }
 

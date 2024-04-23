@@ -1,14 +1,6 @@
 package com.hanse.codechallenge.persistence.entity;
 
-import jakarta.persistence.CollectionTable;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Index;
-import jakarta.persistence.JoinColumn;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.Instant;
@@ -22,13 +14,20 @@ public class PersistedMonitoringJob {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "job_name")
     private String jobName;
+
     private String url;
+
+    @Column(name = "interval_in_seconds")
     private long intervalInSeconds;
+
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "monitoring_job_result", joinColumns = @JoinColumn(name = "job_id"),
-            indexes = {@Index(name = "job_result_index", columnList = "job_id, result")})
+    @CollectionTable(name = "monitoring_job_result", joinColumns = @JoinColumn(name = "job_id"))
     private List<PersistedMonitoringResult> results = new ArrayList<>();
+
+    @Column(name = "creation_date")
     private Instant creationDate = Instant.now();
 
     public PersistedMonitoringJob(Long id, String jobName, String url, long intervalInSeconds, List<PersistedMonitoringResult> results) {

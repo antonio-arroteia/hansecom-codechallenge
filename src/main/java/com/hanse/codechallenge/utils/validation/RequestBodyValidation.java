@@ -34,7 +34,7 @@ public class RequestBodyValidation {
         Optional<PersistedMonitoringJob> monitorJobToUpdate = jobRepository.findTopByJobName(monitoringJobDTO.getJobName());
         if (monitorJobToUpdate.isEmpty()) throw new IllegalArgumentException("No monitor job with the specified name: " + monitoringJobDTO.getJobName()) ;
         if(monitoringJobDTO.getIntervalInSeconds() < 10) throw new IllegalArgumentException("The interval specified should be higher than 10 seconds!"); //to regulate a bit the amount of traffic
-        if(!monitoringJobDTO.getUrl().startsWith(urlRegex)) throw  new IllegalArgumentException("Please define the secure url like: https://your_url");
+        if(monitoringJobDTO.getUrl() != null && !monitoringJobDTO.getUrl().startsWith(urlRegex)) throw  new IllegalArgumentException("Please define the secure url like: https://your_url");
     }
 
 

@@ -35,7 +35,7 @@ public class ConverterTests {
         JobResultDTO dto = converter.convert(result);
 
         Assertions.assertEquals(result.getResult(), dto.getResult());
-        Assertions.assertEquals(result.getResponseTime(), dto.getResponseTime());
+        Assertions.assertEquals(result.getResponseTimeInMs(), dto.getResponseTime());
         Assertions.assertEquals(result.getStatusName(), dto.getStatusName());
         Assertions.assertEquals(result.getInfo(), dto.getInfo());
     }

@@ -34,14 +34,18 @@ public class MonitoringJobRepositoryIntegrationTest {
     public void testFindTopByJobName() {
 
         PersistedMonitoringJob job1 = new PersistedMonitoringJob();
-        job1.setJobName("Test Job");
+        job1.setJobName("Test Job 1");
+        job1.setIntervalInSeconds(10);
+        job1.setUrl("https://example.com");
         PersistedMonitoringJob job2 = new PersistedMonitoringJob();
         job2.setJobName("Test Job 2");
+        job2.setIntervalInSeconds(10);
+        job2.setUrl("https://example.com");
         monitoringJobRepository.saveAll(List.of(job1, job2));
 
-        Optional<PersistedMonitoringJob> optionalJob = monitoringJobRepository.findTopByJobName("Test Job");
+        Optional<PersistedMonitoringJob> optionalJob = monitoringJobRepository.findTopByJobName(job1.getJobName());
 
         Assertions.assertTrue(optionalJob.isPresent());
-        Assertions.assertEquals("Test Job", optionalJob.get().getJobName(), "Job name should match");
+        Assertions.assertEquals(job1.getJobName(), optionalJob.get().getJobName(), "Job name should match");
     }
 }

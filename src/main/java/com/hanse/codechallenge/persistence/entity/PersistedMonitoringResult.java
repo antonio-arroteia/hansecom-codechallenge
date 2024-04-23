@@ -2,26 +2,25 @@ package com.hanse.codechallenge.persistence.entity;
 
 import com.hanse.codechallenge.enums.Result;
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.Data;
-import org.springframework.http.HttpStatus;
 
 import java.time.Instant;
 
 @Data
 @Embeddable
 public class PersistedMonitoringResult {
+    @Enumerated(EnumType.STRING)
     private Result result;
-    private long responseTime;
+    private long responseTimeInMs;
     private String statusName;
     private String info;
     private Instant creationDate = Instant.now();
 
-    public PersistedMonitoringResult(Result result, long responseTime, String statusName, String info) {
+    public PersistedMonitoringResult(Result result, long responseTimeInMs, String statusName, String info) {
         this.result = result;
-        this.responseTime = responseTime;
+        this.responseTimeInMs = responseTimeInMs;
         this.statusName = statusName;
         this.info = info;
     }

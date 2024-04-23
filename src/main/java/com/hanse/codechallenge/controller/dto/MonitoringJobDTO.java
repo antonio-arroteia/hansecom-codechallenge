@@ -17,15 +17,19 @@ public class MonitoringJobDTO {
     @NotBlank @NotNull
     @Schema(description = "Name of the job")
     private String jobName;
+
     @NotBlank @NotNull
     @Schema(description = "Result of the job")
     private String url;
+
     @NotNull
     @Schema(description = "Interval between job executions")
     private long intervalInSeconds;
+
     @Schema (description = "Job results")
     @Null
     private List<JobResultDTO> results;
+
     @Null
     @Schema(description = "Creation Date")
     private Instant createdDate;
