@@ -4,9 +4,9 @@ import com.hanse.codechallenge.controller.dto.JobResultSearchCriteriaDTO;
 import com.hanse.codechallenge.controller.dto.MonitoringJobDTO;
 import com.hanse.codechallenge.persistence.entity.PersistedMonitoringJob;
 import com.hanse.codechallenge.persistence.repository.MonitoringJobRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -32,15 +32,15 @@ public class RequestBodyValidation {
     public static void validateMonitorJobOnUpdate(MonitoringJobDTO monitoringJobDTO) {
 
         Optional<PersistedMonitoringJob> monitorJobToUpdate = jobRepository.findTopByJobName(monitoringJobDTO.getJobName());
-        if (monitorJobToUpdate.isEmpty()) throw new IllegalArgumentException("No monitor job with the specified name: " + monitoringJobDTO.getJobName()) ;
+        if (monitorJobToUpdate.isEmpty()) throw new EntityNotFoundException("No monitor job with the specified name: " + monitoringJobDTO.getJobName()) ;
         if(monitoringJobDTO.getIntervalInSeconds() < 10) throw new IllegalArgumentException("The interval specified should be higher than 10 seconds!"); //to regulate a bit the amount of traffic
         if(monitoringJobDTO.getUrl() != null && !monitoringJobDTO.getUrl().startsWith(urlRegex)) throw  new IllegalArgumentException("Please define the secure url like: https://your_url");
     }
 
 
     public static void validateSearchResultCriteria(JobResultSearchCriteriaDTO searchCriteriaDTO){
-        if(searchCriteriaDTO != null && searchCriteriaDTO.getTimeRange() != null && searchCriteriaDTO.getTimeRange().getLowerBound() != null && searchCriteriaDTO.getTimeRange().getUpperBound() != null ){
-            if(searchCriteriaDTO.getTimeRange().getLowerBound().isAfter(searchCriteriaDTO.getTimeRange().getUpperBound())){
+        if(searchCriteriaDTO != null && searchCriteriaDTO.getTimeRange() != null && searchCriteriaDTO.getTimeRange().getFromInstant() != null && searchCriteriaDTO.getTimeRange().getUntilInstant() != null ){
+            if(searchCriteriaDTO.getTimeRange().getFromInstant().isAfter(searchCriteriaDTO.getTimeRange().getUntilInstant())){
                 throw new IllegalArgumentException("The lower time bound specified in the time range must be before the higher bound!");
             }
         }

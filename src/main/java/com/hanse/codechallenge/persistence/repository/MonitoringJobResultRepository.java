@@ -10,14 +10,11 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public class MonitoringJobResultRepository {
@@ -42,17 +39,17 @@ public class MonitoringJobResultRepository {
 
         }
         if(criteria.getTimeRange() != null){
-            Instant minRange = criteria.getTimeRange().getLowerBound();
-            Instant maxRange = criteria.getTimeRange().getUpperBound();
-            if(minRange !=null && maxRange != null ) {
-                predicates.add(cb.greaterThanOrEqualTo(resultJoin.get("creationDate"), minRange));
-                predicates.add(cb.lessThanOrEqualTo(resultJoin.get("creationDate"), maxRange));
+            Instant from = criteria.getTimeRange().getFromInstant();
+            Instant until = criteria.getTimeRange().getUntilInstant();
+            if(from !=null && until != null ) {
+                predicates.add(cb.greaterThanOrEqualTo(resultJoin.get("creationDate"), from));
+                predicates.add(cb.lessThanOrEqualTo(resultJoin.get("creationDate"), until));
             } else {
-                if(minRange != null) {
-                    predicates.add(cb.greaterThanOrEqualTo(resultJoin.get("creationDate"), minRange));
+                if(from != null) {
+                    predicates.add(cb.greaterThanOrEqualTo(resultJoin.get("creationDate"), from));
                 }
-                if(maxRange != null) {
-                    predicates.add(cb.lessThanOrEqualTo(resultJoin.get("creationDate"), maxRange));
+                if(until != null) {
+                    predicates.add(cb.lessThanOrEqualTo(resultJoin.get("creationDate"), until));
                 }
             }
         }

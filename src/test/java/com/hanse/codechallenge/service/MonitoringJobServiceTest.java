@@ -104,4 +104,5 @@ public class MonitoringJobServiceTest {
         assertNotNull(result.get(1).getCreationDate());
         verify(jobRepositoryMock).findAll();
     }
+
 }

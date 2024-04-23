@@ -1,6 +1,7 @@
 package com.hanse.codechallenge.controller.dto;
 
 import com.hanse.codechallenge.enums.Result;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -16,7 +17,7 @@ public class JobResultDTO {
     @Schema(description = "Response time from the execution")
     private long responseTime;
 
-    @Schema(description = "Result HTTP status")
+    @Schema(description = "Result HTTP status", example = "OK")
     private String statusName;
 
     @Schema(description = "Result additional info")

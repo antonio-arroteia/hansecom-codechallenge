@@ -12,7 +12,7 @@ public class TaskSchedulerConfig {
         ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
         taskScheduler.setPoolSize(10); // Set the number of threads in the pool
         taskScheduler.setThreadNamePrefix("ThreadPoolTaskScheduler-");
-        taskScheduler.initialize();
+        taskScheduler.setWaitForTasksToCompleteOnShutdown(true); //this prevents a
         return taskScheduler;
     }
 }

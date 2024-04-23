@@ -6,11 +6,11 @@ import java.time.Instant;
 
 @Data
 public class TimeRange {
-    private Instant lowerBound;
-    private Instant upperBound;
+    private Instant fromInstant;
+    private Instant untilInstant;
 
-    public TimeRange(Instant lowerBound, Instant upperBound) {
-        this.lowerBound = lowerBound;
-        this.upperBound = upperBound;
+    public TimeRange(Instant fromInstant, Instant untilInstant) {
+        this.fromInstant = fromInstant;
+        this.untilInstant = untilInstant;
     }
 }

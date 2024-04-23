@@ -37,15 +37,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(status).body(errorResponse);
     }
 
-    @ExceptionHandler(TaskRejectedException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ResponseBody
-    public ResponseEntity<ErrorResponseDTO> handleTaskRejectedException(TaskRejectedException ex) {
-        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-        ErrorResponseDTO errorResponse = new ErrorResponseDTO(status, ex.getMessage());
-        return ResponseEntity.status(status).body(errorResponse);
-    }
-
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody

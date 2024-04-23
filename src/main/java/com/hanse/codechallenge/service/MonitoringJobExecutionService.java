@@ -4,9 +4,10 @@ import com.hanse.codechallenge.enums.Result;
 import com.hanse.codechallenge.persistence.entity.PersistedMonitoringJob;
 import com.hanse.codechallenge.persistence.entity.PersistedMonitoringResult;
 import com.hanse.codechallenge.persistence.repository.MonitoringJobRepository;
-import jakarta.annotation.PostConstruct;
-import jakarta.transaction.Transactional;
 import lombok.Data;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,12 +17,10 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
-
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class MonitoringJobExecutionService {
@@ -37,14 +36,29 @@ public class MonitoringJobExecutionService {
 
     private final Logger logger = LoggerFactory.getLogger(MonitoringJobExecutionService.class);
 
-    public void updateTasks(){
-        if(taskScheduler.isRunning())taskScheduler.getScheduledExecutor().shutdown();
-        initializeTasks();
+    @EventListener(ApplicationReadyEvent.class)
+    private void init(){
+       initializeTasks();
     }
 
+    public void updateTasks(){
+        stopTasks();
+        initializeTasks(); //Initialize tasks after shutdown
+    }
 
-    @EventListener(ApplicationReadyEvent.class)
-    public void initializeTasks(){
+    public void stopTasks(){
+        if (taskScheduler.isRunning()) {
+            taskScheduler.shutdown(); // Shutdown the task scheduler
+            try {
+                taskScheduler.getScheduledExecutor().awaitTermination(5, TimeUnit.SECONDS); // Wait for shutdown
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                logger.error("Error while shutting down task scheduler: " + e.getLocalizedMessage());
+            }
+        }
+    }
+
+    private void initializeTasks(){
         if(!taskScheduler.isRunning()) taskScheduler.initialize();
         if (!environment.matchesProfiles("test")) {
             jobRepository.findAll().parallelStream().forEach(job -> {
@@ -62,7 +76,7 @@ public class MonitoringJobExecutionService {
 
     private void addJobResult(PersistedMonitoringJob monitoringJob, JobResult result){
         PersistedMonitoringResult monitoringResult = new PersistedMonitoringResult(
-                result.result, result.durationInMillis, result.requestStatus.name(), (result.requestStatus != HttpStatus.OK) ? result.requestStatus.getReasonPhrase() :  ""
+                result.getResult(), result.getDurationInMillis(), result.getRequestStatus().name(), (result.getRequestStatus() != HttpStatus.OK) ? result.getRequestStatus().getReasonPhrase() :  ""
         );
         monitoringJob.addResult(monitoringResult);
         jobRepository.save(monitoringJob);
@@ -70,26 +84,26 @@ public class MonitoringJobExecutionService {
 
 
     private JobResult testUrl(String jobName, String url) {
-        HttpURLConnection connection = null;
+        OkHttpClient client = new OkHttpClient();
         try {
-            URL urlObj = new URL(url);
-            connection = (HttpURLConnection) urlObj.openConnection();
-            connection.setRequestMethod("GET");
+
+            Request request = new Request.Builder()
+                    .url(url)
+                    .build();
 
             long startTime = System.currentTimeMillis();
-            connection.connect();
+            Response response = client.newCall(request).execute();
 
             long endTime = System.currentTimeMillis();
-            int responseCode = connection.getResponseCode();
             long responseTime = endTime - startTime;
 
-            if(responseCode == HttpURLConnection.HTTP_OK) {
+            if(response.isSuccessful()) {
                 logger.info("Monitoring Job: "+ jobName + " URL: " + url + " - Success, Response Time: " + responseTime + " ms");
-                return new JobResult(Result.SUCCESS, responseTime, HttpStatus.OK);
+                return new JobResult(Result.SUCCESS, responseTime, HttpStatus.valueOf(response.code()));
 
             } else {
-                logger.info("Monitoring Job: "+ jobName + " URL: " + url + " - Failed, Response Code: " + responseCode);
-                return new JobResult(Result.FAILED, responseTime, HttpStatus.valueOf(responseCode));
+                logger.info("Monitoring Job: "+ jobName + " URL: " + url + " - Failed, Response Code: " + response.code()," Response Time: " + responseTime +" ms");
+                return new JobResult(Result.FAILED, responseTime, HttpStatus.valueOf(response.code()));
 
             }
 
@@ -98,11 +112,9 @@ public class MonitoringJobExecutionService {
             return new JobResult(Result.FAILED,0,HttpStatus.NOT_FOUND);
 
         } finally {
-            if (connection != null) {
-                connection.disconnect();
+                client.dispatcher().executorService().shutdown();
             }
         }
-    }
 
     @Data
     private class JobResult{

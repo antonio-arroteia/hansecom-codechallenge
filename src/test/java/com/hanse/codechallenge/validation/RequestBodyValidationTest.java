@@ -6,6 +6,7 @@ import com.hanse.codechallenge.controller.dto.TimeRange;
 import com.hanse.codechallenge.persistence.entity.PersistedMonitoringJob;
 import com.hanse.codechallenge.persistence.repository.MonitoringJobRepository;
 import com.hanse.codechallenge.utils.validation.RequestBodyValidation;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -77,7 +78,7 @@ class RequestBodyValidationTest {
         MonitoringJobDTO dto = new MonitoringJobDTO();
         dto.setJobName("name");
         // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> requestBodyValidation.validateMonitorJobOnUpdate(dto));
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> requestBodyValidation.validateMonitorJobOnUpdate(dto));
         assertEquals("No monitor job with the specified name: name", exception.getMessage());
 
         // Verify interactions

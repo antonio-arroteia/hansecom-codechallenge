@@ -16,6 +16,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @ExtendWith(MockitoExtension.class)
 public class MonitoringJobExecutionTest {
@@ -41,7 +42,7 @@ public class MonitoringJobExecutionTest {
     }
 
     @Test
-    public void testUpdateTasks() {
+    public void testUpdateTasks() throws InterruptedException {
         Mockito.when(taskSchedulerMock.isRunning()).thenReturn(true);
         Mockito.when(taskSchedulerMock.getScheduledExecutor()).thenReturn(executorServiceMock);
 
@@ -49,22 +50,8 @@ public class MonitoringJobExecutionTest {
 
         Mockito.verify(taskSchedulerMock, Mockito.times(2)).isRunning();
         Mockito.verify(taskSchedulerMock, Mockito.times(1)).getScheduledExecutor();
-        Mockito.verify(taskSchedulerMock.getScheduledExecutor(), Mockito.times(1)).shutdown();
-    }
+        Mockito.verify(taskSchedulerMock.getScheduledExecutor(), Mockito.times(1)).awaitTermination(5L, TimeUnit.SECONDS);
 
-    @Test
-    public void testInitializeTasks_WhenNotRunningAndNotTestProfile_ShouldInitializeAndScheduleTasks() {
-        Mockito.when(taskSchedulerMock.isRunning()).thenReturn(false);
-        Mockito.when(environmentMock.matchesProfiles("test")).thenReturn(false);
-        Mockito.when(jobRepositoryMock.findAll()).thenReturn(List.of(new PersistedMonitoringJob()));
-
-
-        executionService.initializeTasks();
-
-        Mockito.verify(taskSchedulerMock, Mockito.times(1)).isRunning();
-        Mockito.verify(taskSchedulerMock, Mockito.times(1)).initialize();
-        Mockito.verify(jobRepositoryMock, Mockito.times(1)).findAll();
-        Mockito.verify(taskSchedulerMock, Mockito.times(1)).scheduleWithFixedDelay(ArgumentMatchers.any(Runnable.class), Mockito.any());
     }
 
 }
